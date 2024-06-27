@@ -25,6 +25,12 @@ public class HeroUpdateEndPoint : Endpoint<Request, Response, Mapper>
             var useCase = new HeroUpdateUseCase(_dbContext);
             var updatedHero = await useCase.exec(updateData);
 
+            if (updatedHero is null)
+            {
+                await SendNotFoundAsync(ct);
+                return;
+            }
+
             var response = Map.FromEntity(updatedHero);
 
             await SendAsync(response);

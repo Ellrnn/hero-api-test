@@ -39,7 +39,14 @@ public class HeroData : IHero
 
     public async Task<Hero> update(Hero entity)
     {
-        _context.Heroes.Update(entity);
+        var hero = await _context.Heroes.FindAsync(entity.id);
+
+        if (hero is null)
+        {
+            return null; 
+        }
+
+        _context.Entry(hero).CurrentValues.SetValues(entity);
 
         _ = await _context.SaveChangesAsync();
 
