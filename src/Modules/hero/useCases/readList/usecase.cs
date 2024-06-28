@@ -12,7 +12,7 @@ public class HeroReadListUseCase
         _data = new HeroData(_context);
     }
 
-    public async Task<List<Hero>> exec()
+    public async Task<List<HeroDto>> exec()
     {
         return await _data.readList();
     }

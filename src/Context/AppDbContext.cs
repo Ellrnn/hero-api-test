@@ -6,7 +6,9 @@ namespace backend_challenge.context;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {}
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {
+        Database.EnsureCreated();
+    }
 
     public DbSet<Hero>? Heroes { get; set; }
     public DbSet<Superpower>? SuperPowers { get; set; }
@@ -21,6 +23,11 @@ public class AppDbContext : DbContext
         mb.Entity<Hero>()
             .Property(hero => hero.name)
             .IsRequired();
+
+        mb.Entity<Hero>()
+            .HasOne(hero => hero.UniformColor)
+            .WithMany(uc => uc.Heroes)
+            .HasForeignKey(hero => hero.UniformColorId);
         #endregion
 
         #region Superpower
@@ -55,6 +62,20 @@ public class AppDbContext : DbContext
                 new UniformColor { id = Guid.NewGuid(), name = "Black" },
                 new UniformColor { id = Guid.NewGuid(), name = "White" }
             );
+        #endregion
+
+        #region Hero-Superpower Relationship
+        mb.Entity<Hero>()
+        .HasMany(h => h.Superpowers)
+        .WithMany(s => s.Heroes)
+        .UsingEntity<Dictionary<string, object>>(
+            "HeroSuperpower",
+            r => r.HasOne<Superpower>().WithMany().HasForeignKey("SuperpowerId"),
+            l => l.HasOne<Hero>().WithMany().HasForeignKey("HeroId"),
+            je =>
+            {
+                je.HasKey("HeroId", "SuperpowerId");
+            });
         #endregion
     }
 }

@@ -1,4 +1,6 @@
 using backend_challenge.context;
+using backend_challenge.Modules.superpower.repository;
+using backend_challenge.Modules.uniformColor.repository;
 
 namespace backend_challenge.Modules.hero.repository;
 
@@ -22,11 +24,30 @@ public class HeroData : IHero
         return entity;
     }
 
-    public async Task<List<Hero>> readList()
+    public async Task<List<HeroDto>> readList()
     {
-        var query = _context.Heroes;
+        var query = _context.Heroes.Include(h => h.UniformColor).Include(h => h.Superpowers);
+        var heroes = await query.ToListAsync();
 
-        return await query.ToListAsync();
+            var heroDtos = heroes.Select(hero => new HeroDto
+            {
+                id = hero.id,
+                name = hero.name,
+                description = hero.description,
+                image = hero.image,
+                UniformColor = new UniformColorDto
+                {
+                    id = hero.UniformColor.id,
+                    name = hero.UniformColor.name
+                },
+                SuperPowers = hero.Superpowers.Select(superpower => new SuperPowerDto 
+                {
+                    id = superpower.id,
+                    name = superpower.name
+                }).ToList()
+            }).ToList();
+
+        return heroDtos;
     }
 
 

@@ -3,7 +3,7 @@ using backend_challenge.Modules.hero.repository;
 
 namespace backend_challenge.Modules.hero.useCases.readList;
 
-public class HeroReadListEndPoint : EndpointWithoutRequest<List<Hero>>
+public class HeroReadListEndPoint : EndpointWithoutRequest<List<HeroDto>>
 {
     public AppDbContext _dbContext { get; set; }
 

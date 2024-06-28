@@ -1,4 +1,5 @@
 using backend_challenge.context;
+using Namotion.Reflection;
 
 namespace backend_challenge.Modules.hero.useCases.create;
 
@@ -23,11 +24,13 @@ public class HeroReadOneEndPoint : Endpoint<Request, Response, Mapper>
         {
             var useCase = new HeroCreateUseCase(_dbContext);
 
-            var newHero = Map.ToEntity(req);
+            var mapper = new Mapper(_dbContext);
+
+            var newHero = await mapper.ToEntityAsync(req, ct);
 
             var createdHero = await useCase.exec(newHero);
 
-            var responseHero = Map.FromEntity(createdHero);
+            var responseHero = mapper.FromEntity(createdHero);
 
             await SendAsync(responseHero);
         }
